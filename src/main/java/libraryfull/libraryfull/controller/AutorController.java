@@ -1,5 +1,6 @@
 package libraryfull.libraryfull.controller;
 
+import jakarta.validation.Valid;
 import libraryfull.libraryfull.dto.AutorDTO;
 import libraryfull.libraryfull.dto.ErroRespostaDTO;
 import libraryfull.libraryfull.exceptions.OperacaoNaoPermitidaException;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -25,7 +27,6 @@ public class AutorController {
 
     private final AutorService autorService;
     private Logger logger = LoggerFactory.getLogger(AutorController.class);
-
 
 
     @GetMapping
@@ -41,52 +42,39 @@ public class AutorController {
     @GetMapping("{id}")
     public ResponseEntity<List<AutorDTO>> buscarAutoresPorId(
             @PathVariable Long id
-    ){
+    ) {
         logger.info("GET -> /autores/" + id);
         var lista = this.autorService.buscarAutoresPorId(id);
         return new ResponseEntity(lista, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<?> salvarAutor(
-            @RequestBody AutorDTO autorDTO
-    ){
+    public ResponseEntity<Void> salvarAutor(
+            @RequestBody @Valid AutorDTO autorDTO
+    ) {
         logger.info("POST -> /autores");
-        try{
-            this.autorService.salvarAutor(autorDTO);
-            return new ResponseEntity(HttpStatus.CREATED);
-        }catch (RegistroDuplicadoException e){
-            var erroDTO = ErroRespostaDTO.conflito(e.getMessage());
-            return ResponseEntity.status(erroDTO.status()).body(erroDTO);
-        }
+        this.autorService.salvarAutor(autorDTO);
+        return new ResponseEntity(HttpStatus.CREATED);
+
     }
 
     @PutMapping("{id}")
     public ResponseEntity<?> atualizarAutor(
             @PathVariable(value = "id") Long id,
             @RequestBody AutorDTO autorDTO
-    ){
+    ) {
         logger.info("PUT -> /autores/" + id);
-        try{
-            this.autorService.atualizarAutor(id, autorDTO);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (RegistroDuplicadoException e){
-            var erroDTO = ErroRespostaDTO.conflito(e.getMessage());
-            return ResponseEntity.status(erroDTO.status()).body(erroDTO);
-        }
+        this.autorService.atualizarAutor(id, autorDTO);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+
 
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> excluirAutor(@PathVariable("id") Long id) {
         logger.info("DELETE -> /autores/" + id);
-        try{
-            this.autorService.excluirAutor(id);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (OperacaoNaoPermitidaException e){
-            var erroDTO = ErroRespostaDTO.respostaPadrão(e.getMessage());
-            return ResponseEntity.status(erroDTO.status()).body(erroDTO);
-        }
+        this.autorService.excluirAutor(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
 
     }
 }

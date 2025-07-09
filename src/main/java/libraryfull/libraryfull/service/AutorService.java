@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,8 +67,8 @@ public class AutorService {
     }
 
     public void excluirAutor(Long id) {
-        Optional<Autor> autorOptional = this.autorRepository.findById(id);
-        Autor autor = autorOptional.get();
+        Autor autorOptional = this.autorRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Autor autor = autorOptional;
 
         if(possuiLivros(autor)){
             throw new OperacaoNaoPermitidaException("não é permitido excluir autor que possui livros cadastrados.");
