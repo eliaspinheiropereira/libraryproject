@@ -1,8 +1,10 @@
 package libraryfull.libraryfull.model;
 
 public enum GeneroLivro {
-    TERROR,
-    COMEDIA,
+    FICCAO,
+    FANTASIA,
+    MISTERIO,
     ROMANCE,
-    SUSPENSE
+    BIOGRAFIA,
+    CIENCIA
 }
